@@ -1,0 +1,38 @@
+{
+  "kisiler" : 
+  [
+    {
+      "name": "Alperen",
+      "surname": "Efe"
+    },
+    {
+      "name": "Emre",
+      "surname": "Menevse"
+    },
+    {
+      "name": "Cihan",
+      "surname": "Turgut"
+    },
+    {
+      "name": "Mehmet",
+      "surname": "Ak"
+    },
+    {
+      "name": "Irem",
+      "surname": "Kilic"
+    },
+    {
+      "name": "İsmail",
+      "surname": "Karpuz"
+    },
+    {
+      "name": "Hasan",
+      "surname": "Akyar"
+    },
+    {
+      "name": "Yagmur",
+      "surname": "Aktas"
+    }
+
+  ]
+}

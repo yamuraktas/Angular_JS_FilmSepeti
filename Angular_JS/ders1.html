@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>YAMUR </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.sanitize.js">
+    </script>
+
+    <style>
+
+        container {
+            background-color: #dc3545;
+            width: 100%;
+            height: 200px;
+            position: relative;
+            top: 0;
+            left: 0;
+            transition: all linear 2s;
+        }
+
+
+        .ng-hide {
+            height: 0;
+            width: 0;
+            background-color: transparent;
+        }
+
+        table {
+            border-collapse: collapse;
+            border: 1px solid black;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+            font-family: fantasy;
+            border-bottom: 1px solid #ddd;
+        }
+
+            td:hover {
+                background-color: #dc3545;
+            }
+
+        .grey {
+            color: grey;
+        }
+
+        .black {
+            color: black;
+        }
+    </style>
+</head>
+<body ng-app="myApp" ng-controller="myControl">
+
+    <!-- <div ng-init="sayilar=[1,2,3,4]">
+
+          <p>{{sayilar}}</p>
+    </div>
+        -->
+    <!--
+    <div ng-init="renk='blue' ">
+        <p style="background-color:{{renk}}"ng-model="renk">HELLO</p>
+    </div>
+
+
+    <p>{{name + ' ' + surname}}</p>
+        -->
+    <!--<input type="number" ng-model="firstNu" />
+    <br />
+    <input type="number" ng-model="secondNu" />
+    <br />
+    <input type="text" ng-model="name" ng-model-options="{updateOn: 'click'}" />-->
+    <!--debounce: 2000 ->geciktirme
+        ng-valid type='email' allowInvalid -> geçersizliğe izin verme false-- onaylamayacak -->
+    <!--<p>{{firstNu * secondNu}}</p>
+    <p>{{name}}</p>
+
+    <ul>
+        <li ng-repeat="x in people">{{x.name + '' +x.language}}</li>
+    </ul>
+
+    <input type="text" ng-model="username" placeholder="Username"/>
+    <button ng-disabled="username.lenght<3">SAVEp</button>
+
+    <p ng-if="!username">Kullanıcı Adı Bos Bırakılamaz</p>
+
+    <img ng-src="{{image}}"/>
+        -->
+    <h1 ng-style="test1">
+        LOGO
+    </h1>
+    <!--<select ng-model="option">
+
+        <option value="grey">GREY</option>
+        <option value="black">BLACK</option>
+    </select>
+
+    <div ng-class="option">
+        LOGO
+    </div>-->
+    <hr />
+    <p ng-style="{{link2}}"> <a ng-href="{{link}}"> Logo'ya Hoş Geldiniz</a></p>
+
+    <label><input type="radio" ng-model="test" value="en" /> İngilizce </label>
+    <label><input type="radio" ng-model="test" value="is" /> İspanyolca </label>
+    <label><input type="radio" ng-model="test" value="fr" /> Fransızca </label>
+    <hr />
+
+    <div ng-switch="test">
+        <div ng-switch-when="en">
+            <p>Welcome</p>
+        </div>
+        <div ng-switch-when="is">
+            <p>Bienvenidos</p>
+        </div>
+        <div ng-switch-when="fr">
+            <p>Bienvenue</p>
+        </div>
+
+    </div>
+
+    <input type="text" ng-model="search" placeholder="Ara" />
+
+    <table>
+        <thead>
+
+            <tr>
+                <th>INDEX</th>
+                <th ng-click="sortBY('name')">NAME</th>
+                <th ng-click="sortBY('surname')">SURNAME</th>
+            </tr>
+
+        </thead>
+
+        <tbody ng-repeat="x in people | filter : search ">
+            <!--<tr ng-repeat="x in people| orderBy : sort : reverse" ng-class-even="'black'" ng-class-odd="'grey'">
+                -->
+            <tr>
+                <td>{{$index+1}}</td>
+                <!--<td ng-if="$odd" style="color: #808080">{{x.name}}</td>
+                <td ng-if="$even" style="color: #000000">{{x.name}}</td>-->
+                <td>{{x.name}}</td>
+                <td>{{x.surname}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- MANİTAMA BAYILIYORUUUUUUUUUUUUUUUUUUUUUUUUUM -->
+
+    <hr />
+    <p ng-mouseenter="mouseFunction()" ng-mouseleave="mouseLeave()"
+       ng-style="{'color':jcolor,'background-color':bcolor,'text-align':center}">İYİ GÜNLER {{value|date}}</p>
+
+
+    <div>
+        {{end}}
+    </div>
+
+
+    <script>
+
+        var app = angular.module("myApp", []);
+
+        //app.controller("myControl", function ($scope) {
+
+        //    //html dökümanıma hakim olan parametre--> scope
+        //    $scope.name = "Yamur";
+        //    $scope.surname = "Aktas";
+
+        //});
+
+        //app.controller("myControl", function ($scope) {
+
+        //    $scope.firstNu = "4";
+        //    $scope.secondNu = "4";
+        //    $scope.name = "Yagmur";
+        //});
+
+        //app.controller("myControl", function ($scope) {
+
+        //    $scope.people = [{ name: 'Yagmur', language: 'Ingilizce' }, { name: 'Merve', language: '   Almanca' }]
+        //});
+
+
+
+        app.controller("myControl", function ($scope, $http, $timeout) {
+
+            $scope.username = "";
+            $scope.image = "foto1";
+            $scope.value = new Date();
+            $scope.test1 = {
+
+
+                "color": "white",
+                "background": "#dc3545",
+                "font-size": "50px",
+                "font-family": "fantasy",
+                "text-align": "center"
+            }
+
+            $scope.link = "https://www.logo.com.tr/?utm_source=yandex&utm_medium=cpc&utm_campaign=branding&utm_content=logo-yazilim&yclid=9281647119959588863";
+
+            $scope.link2 = {
+                "text-align": "center"
+            }
+
+            $scope.mouseFunction = function () {
+
+                $scope.jcolor = "white";
+                $scope.bcolor = "#dc3545";
+
+            };
+            $scope.mouseLeave = function () {
+
+                $scope.jcolor = "#dc3545";
+                $scope.bcolor = "white";
+
+            };
+
+            $scope.sortBY = function (x) {
+
+                $scope.sort = x;
+                $scope.reverse = !$scope.reverse;
+            };
+
+           
+
+            $scope.end = "İYİ GÜNLER...";
+            $timeout(function () {
+
+                $scope.end = "HAVE A NICE DAY...";
+
+            }, 3000);
+            //$http.get("TextFile.txt").then(function (response) {
+
+            //    $scope.deneme = response.data;
+            //});
+
+            //$http.get("table.json").then(function (response) {
+
+            //    $scope.people = response.data.kisiler;
+            //});
+
+
+        });
+
+
+
+    </script>
+</body>
+</html>

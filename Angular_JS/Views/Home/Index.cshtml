@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>AngularJS in ASP.NET Core</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <style>
+
+
+        .custom-select {
+            /* Özel stiller */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            color: #333;
+            width: 500px; /* Özel genişlik */
+        }
+
+            .custom-select:hover {
+                /* Farenin üstüne gelindiğindeki stil */
+                background-color: #4CAF50;
+            }
+
+            .custom-select:focus {
+                /* Seçili olduğunda ki stil */
+                outline: none;
+                border-color: #4CAF50;
+            }
+
+        table {
+            border-collapse: collapse;
+            border: 1px solid black;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+            td:hover {
+                background: linear-gradient(to  right, #4CA, #0000ff);
+            }
+
+        input[type=checkbox] {
+            accent-color: green;
+        }
+
+        body{
+            font-family: fantasy;
+        }
+
+
+        .header {
+            background: linear-gradient(to right, #30496B, #7062F0);
+            text-align: center;
+            font-family: Broadway;
+            font-size: 100px;
+       
+        }
+        h1{
+            
+            font-family: Broadway;
+        }
+    </style>
+
+   
+
+</head>
+
+<body ng-app="myApp" ng-controller="myController">
+
+    <div class="header">
+        FİLM SEPETİ
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Film Sepeti</a>
+           
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                <select class="custom-select me-2" ng-model="selectedGenre" ng-change="filterFilms()">
+                    <option value="">Tüm Filmler</option>
+                    <option ng-repeat="genre in genres" value="{{ genre }}">{{genre}}</option>
+                </select>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Film Ara" aria-label="Search" ng-model="searchText" ng-change="searchFilms()">
+                    <button class="btn btn-outline-success" type="button" ng-click="searchFilms()">Ara</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <hr style="border-top:1px dotted #ccc;" />
+                <h4>FİLMLER</h4>
+                <hr style="border-top:1px groovy #ccc;" />
+                <div id="product">
+                    <div id="p_list" ng-repeat="film in filteredFilms track by film.id">
+                        <div class="card mb-3" style="max-width: 540px;">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="..." class="img-fluid rounded-start" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{film.fname}}</h5>
+                                        <p class="card-text">Yıl: {{film.fyear}}</p>
+                                        <p class="card-text">Tür: {{film.category}}</p>
+                                        <input type="checkbox" ng-model="film.selected" ng-change="showButtons()" />
+                                        <div ng-show="film.buttonShow">
+                                            <button type="button" class="btn btn-outline-warning" ng-disabled="!film.selected" ng-click="rent(film.id)">Kirala</button>
+                                            <button type="button" class="btn btn-outline-warning" ng-disabled="!film.selected" ng-click="buy(film.id)">Satın Al</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                SEPETİM
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Film</th>
+                                            <th>Fiyat</th>
+                                            <th></th> 
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in items" ng-init="setTotals(item)">
+                                            <td>{{ item.filmName }}</td>
+                                            <td>{{ item.Price }}</td>
+                                            <td><button type="button" ng-click="remove_item(item)" class="btn btn-danger"> X</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right">Toplam</td>
+                                            <td colspan="2">{{total}}</td> <!-- Toplam fiyatın olduğu hücre için colspan eklenerek genişletildi -->
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <script>
+        angular.module('myApp', [])
+            .controller('myController', function ($scope) {
+
+                $scope.films = [
+                    { "id": 1, "fname": "Film 1", "fyear": "2020", "category": "Aksiyon" },
+                    { "id": 2, "fname": "Film 2", "fyear": "2023", "category": "Aksiyon" },
+                    { "id": 3, "fname": "Film 3", "fyear": "2018", "category": "Aksiyon" },
+
+                    { "id": 4, "fname": "Zootropolis", "fyear": "2017", "category": "Animasyon" },
+                    { "id": 5, "fname": "Cars", "fyear": "2018", "category": "Animasyon" },
+                    { "id": 6, "fname": "Frozen", "fyear": "2023", "category": "Animasyon" },
+
+                    { "id": 7, "fname": "Interstaller", "fyear": "2011", "category": "Bilim Kurgu" },
+                    { "id": 8, "fname": "Tenet", "fyear": "2010", "category": "Bilim Kurgu" },
+                    { "id": 9, "fname": "Dune", "fyear": "2024", "category": "Bilim Kurgu" },
+
+                ];
+
+
+                $scope.genres = ['Aksiyon', 'Animasyon', 'Bilim Kurgu'];
+
+                $scope.selectedGenre = '';
+
+                $scope.filterFilms = function () {
+                    if ($scope.selectedGenre === '') {
+                        $scope.filteredFilms = $scope.films;
+                    } else {
+                        $scope.filteredFilms = $scope.films.filter(function (film) {
+                            return film.category === $scope.selectedGenre;
+                        });
+                    }
+                };
+                $scope.filterFilms();
+
+                $scope.searchText = ''; // Arama ifadesi için bir değişken tanımlanır
+
+                $scope.searchFilms = function () { // Arama işlevi
+                    if (!$scope.searchText) { // Arama ifadesi boşsa, tüm filmleri göster
+                        $scope.filteredFilms = $scope.films;
+                    } else {
+                        $scope.filterFilms();
+                        var searchTextLower = $scope.searchText.toLowerCase();
+                       
+                        $scope.filteredFilms = $scope.films.filter(function (film) {
+                            return film.fname.toLowerCase().includes(searchTextLower) ||
+                                film.fyear.toLowerCase().includes(searchTextLower) ||
+                                film.category.toLowerCase().includes(searchTextLower);
+                        });
+                    }
+                };
+
+
+                // $scope.getSelectedFilmId = function (x) {
+
+                //     if (x.selected)
+                //         return x.id;
+                // }
+                $scope.showButtons = function () {
+                    $scope.filteredFilms.forEach(function (film) {
+                        film.buttonShow = film.selected;
+                        if (film.selected) {
+                            $scope.selectedFilmId = film.id;
+                        }
+                    });
+                };
+
+                $scope.rent = function (filmId) {
+                    var selectedFilm;
+
+                    // Seçilen filmi bul
+                    for (var i = 0; i < $scope.filteredFilms.length; i++) {
+                        if ($scope.filteredFilms[i].id === filmId) {
+                            selectedFilm = $scope.filteredFilms[i];
+                            break;
+                        }
+                    }
+
+                    //let selectedFilm = $scope.filteredFilms.find(film => film.id === filmId);
+
+                    // Seçilen film kategorisine göre fiyatı belirle
+                    switch (selectedFilm.category) {
+                        case 'Aksiyon':
+                            selectedFilm.price = 50;
+                            break;
+                        case 'Animasyon':
+                            selectedFilm.price = 30;
+                            break;
+                        case 'Bilim Kurgu':
+                            selectedFilm.price = 40;
+                            break;
+                        default:
+                            selectedFilm.price = 10; // Eğer kategori belirtilmemişse fiyatı sıfıra ayarla
+                    }
+
+                    var item = {
+                        filmId: filmId,
+                        filmName: selectedFilm.fname,
+                        category: selectedFilm.category,
+                        Price: selectedFilm.price
+                    };
+
+                    // Sepete ekleme işlemi
+                    if (!$scope.items) {
+                        $scope.items = []; // Sepet boşsa yeni bir dizi oluştur
+                    }
+                    $scope.items.push(item);
+
+
+                };
+
+                $scope.total = 0;
+
+                $scope.setTotals = function (item) {
+                    if (item) {
+                        $scope.total += item.Price;
+                    }
+                };
+
+                $scope.remove_item = function (item) {
+                    if (item) {
+                        $scope.items.splice($scope.items.indexOf(item), 1);
+                        $scope.total -= item.Price;
+                    }
+                };
+
+                $scope.buy = function (filmId) {
+                    
+
+               
+                };
+
+
+            });
+    </script>
+</body>
+</html>
