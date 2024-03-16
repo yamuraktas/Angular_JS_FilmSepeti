@@ -1,6 +1,8 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AngularJS in ASP.NET Core</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -18,18 +20,18 @@
             background-color: #f9f9f9;
             font-size: 16px;
             color: #333;
-            width: 500px; /* Özel genişlik */
+            width: 200px; /* Özel genişlik */
         }
 
             .custom-select:hover {
                 /* Farenin üstüne gelindiğindeki stil */
-                background-color: #4CAF50;
+                background-color: #8fbc8f;
             }
 
             .custom-select:focus {
                 /* Seçili olduğunda ki stil */
                 outline: none;
-                border-color: #4CAF50;
+                border-color: #8fbc8f;
             }
 
         table {
@@ -41,36 +43,71 @@
         th, td {
             padding: 8px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #333
         }
 
             td:hover {
-                background: linear-gradient(to  right, #4CA, #0000ff);
+                background: linear-gradient(to right, #30496B, #7062F0);
             }
 
         input[type=checkbox] {
             accent-color: green;
         }
 
-        body{
+        body {
             font-family: fantasy;
+            background: linear-gradient(to right, #30496B, #7062F0);
         }
 
+        .accordion-body {
+            background-color: #8db2d894;
+        }
+
+        .card-body {
+            background-color: #8db2d894;
+        }
 
         .header {
             background: linear-gradient(to right, #30496B, #7062F0);
-            text-align: center;
+            text-align: left;
             font-family: Broadway;
             font-size: 100px;
-       
         }
-        h1{
-            
+
+        h1 {
             font-family: Broadway;
         }
+
+        .bg-light {
+            background-color: #406489 !important;
+        }
+
+        .form-control{
+            width:270px;
+        }
+        .alert {
+            position: relative;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
     </style>
 
-   
+
 
 </head>
 
@@ -79,15 +116,20 @@
     <div class="header">
         FİLM SEPETİ
     </div>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #30496B;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Film Sepeti</a>
-           
+            <a class="navbar-brand" href="#">Film Sepetine Hoş Geldiniz!</a>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                 <select class="custom-select me-2" ng-model="selectedGenre" ng-change="filterFilms()">
                     <option value="">Tüm Filmler</option>
                     <option ng-repeat="genre in genres" value="{{ genre }}">{{genre}}</option>
+                </select>
+                <select class="custom-select me-2" ng-model="sortBy" ng-change="sortFilms()">
+                    <option value="" disabled selected>YIL</option>
+                    <option value="new">En Yeni</option>
+                    <option value="old">En Eski</option>
                 </select>
                 <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Film Ara" aria-label="Search" ng-model="searchText" ng-change="searchFilms()">
@@ -97,28 +139,34 @@
         </div>
     </nav>
 
+   <!-- FİLMLER -->
+
     <div class="container">
         <div class="row">
             <div class="col-8">
                 <hr style="border-top:1px dotted #ccc;" />
-                <h4>FİLMLER</h4>
-                <hr style="border-top:1px groovy #ccc;" />
+                <h4 style="color:black;">FİLMLER</h4>
+                <hr style="border-top:1px dotted #ccc;" />
                 <div id="product">
                     <div id="p_list" ng-repeat="film in filteredFilms track by film.id">
                         <div class="card mb-3" style="max-width: 540px;">
                             <div class="row g-0">
                                 <div class="col-md-4">
-                                    <img src="..." class="img-fluid rounded-start" alt="...">
+                                    <img src="/img/{{film.imgName}}" alt="{{film.fname}}" style="width:190px; height:180px;">
                                 </div>
                                 <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{film.fname}}</h5>
-                                        <p class="card-text">Yıl: {{film.fyear}}</p>
-                                        <p class="card-text">Tür: {{film.category}}</p>
-                                        <input type="checkbox" ng-model="film.selected" ng-change="showButtons()" />
+                                    <div class="card-body" style="display: flex; align-items: center;">
+                                        <input type="checkbox" ng-model="film.selected" ng-change="showButtons()" style="margin-right: 10px;">
+
+                                        <div style="flex-grow: 1;">
+                                            <h5 class="card-title">{{film.fname}}</h5>
+                                            <p class="card-text">Yıl: {{film.fyear}}</p>
+                                            <p class="card-text">Tür: {{film.category}}</p>
+                                        </div>
+
+                                        <!-- Satın Al  -->
                                         <div ng-show="film.buttonShow">
-                                            <button type="button" class="btn btn-outline-warning" ng-disabled="!film.selected" ng-click="rent(film.id)">Kirala</button>
-                                            <button type="button" class="btn btn-outline-warning" ng-disabled="!film.selected" ng-click="buy(film.id)">Satın Al</button>
+                                            <button type="button" class="btn btn-outline-primary" style="background-color:#8fbc8f;" ng-disabled="!film.selected" ng-click="buy(film.id)">Satın Al</button>
                                         </div>
                                     </div>
                                 </div>
@@ -126,7 +174,10 @@
                         </div>
                     </div>
                 </div>
+
             </div>
+
+   <!-- SEPET -->
             <div class="col-4">
                 <div class="accordion" id="accordionExample">
                     <div class="accordion-item">
@@ -140,24 +191,30 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
+                                            <th></th>
                                             <th>Film</th>
                                             <th>Fiyat</th>
-                                            <th></th> 
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="item in items" ng-init="setTotals(item)">
+                                            <td><input type="checkbox" ng-model="item.selected"></td>
                                             <td>{{ item.filmName }}</td>
                                             <td>{{ item.Price }}</td>
-                                            <td><button type="button" ng-click="remove_item(item)" class="btn btn-danger"> X</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan=" 4">
+                                                <button type="button" align="right" class="btn btn-danger" ng-click="removeSelectedItems()">Seçilenleri Kaldır</button>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td align="right">Toplam</td>
-                                            <td colspan="2">{{total}}</td> <!-- Toplam fiyatın olduğu hücre için colspan eklenerek genişletildi -->
+                                            <td colspan="3">{{total}}</td> <!-- Toplam fiyatın olduğu hücre için colspan eklenerek genişletildi -->
                                         </tr>
                                     </tbody>
                                 </table>
-
+                                <button type="button" class="btn btn-success" ng-click="openModal()" ng-disabled="!items.length">Sepeti Onayla</button>
                             </div>
                         </div>
                     </div>
@@ -167,29 +224,156 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="ccModal" tabindex="-1" role="dialog" aria-labelledby="ccModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ccModalLabel">Kart Bilgileri</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="nems-cc-form">
+                        <div class="nems-cc-field">
+                            <div class="m-input__text">
+                                <label class="m-input__label">Kart Üzerindeki İsim</label>
+                                <div class="m-input__text__wrapper m-input--large">
+                                    <input type="text" id="cc-Name" name="Name" ng-model="cardInfo.name" ng-pattern="/^[a-zA-Z\s]*$/" required>
+                                    <div ng-show="myForm.Name.$dirty && myForm.Name.$valid">
+                                        <span style="color: red;" ng-show="myForm.Name.$error.required"> Bu alan boş bırakılamaz</span>
+                                        <span style="color: red;" ng-show="myForm.Name.$error.pattern">Sadece alfabetik karakterler içermelidir.</span>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nems-cc-field">
+                            <div class="m-input__text">
+                                <label class="m-input__label">Kart Numarası</label>
+                                <div class="m-input__text__wrapper m-input--large">
+                                    <input type="text" id="cc-Number" name="Number" inputmode="numeric" ng-model="cardInfo.number" ng-pattern="/^\d{16}$/" required>
+                                    <span style="color: red;" ng-show="myForm.Number.$error.required"> Bu alan boş bırakılamaz</span>
+                                    @* <span style="color: red;" ng-show="myForm.Number.$error.minlength || myForm.Number.$error.maxlength"> Kart numarası 16 haneli olmalıdır.</span>
+                                    *@
+                                    <span style="color: red;" ng-show="myForm.Number.$error.pattern">Sadece numeric karakterler içermelidir.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nems-cc-field nems-cc-field-date">
+                            <div class="m-input__select">
+                                <label class="m-input__label">Ay</label>
+                                <div class="m-input__select__wrapper m-input--large">
+                                    <select name="ExpireMonth" ng-model="cardInfo.expMonth" required>
+                                        <option hidden="" disabled="" style=""></option>
+                                        <option ng-repeat="month in months" value="{{ $index + 1 }}">{{ ('0' + ($index + 1)).slice(-2) }}</option>
+                                    </select>
 
+                                    <i class="m-icon m-primary icon-chevron--down m-icon--arrow" style="font-size: 16px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nems-cc-field nems-cc-field-date">
+                            <div class="m-input__select">
+                                <label class="m-input__label">Yıl</label>
+                                <div class="m-input__select__wrapper m-input--large">
+                                    <select name="ExpireYear" ng-model="cardInfo.expYear" required>
+                                        <option hidden="" disabled="" style=""></option>
+                                        <option ng-repeat="year in years" value="{{ 2025 + $index }}">{{ 2025 + $index }}</option>
+                                    </select>
+                                    <i class="m-icon m-primary icon-chevron--down m-icon--arrow" style="font-size: 16px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nems-cc-field nems-cc-field-cvc">
+                            <div class="m-input__text">
+                                <label class="m-input__label">CVC</label>
+                                <div class="m-input__text__wrapper m-input--large">
+                                    <input type="text" id="cc-cvc" name="CVC" inputmode="numeric" ng-model="cardInfo.cvc" ng-pattern="/^\d{3}$/" required>
+                                    <span style="color: red;" ng-show="myForm.CVC.$error.required">CVC alanı boş bırakılamaz.</span>
+                                    <span style="color: red;" ng-show="myForm.CVC.$error.minlength || myForm.CVC.$error.maxlength">CVC 3 haneli olmalıdır.</span>
+                                    <span style="color: red;" ng-show="myForm.CVC.$error.pattern">CVC sadece numeric karakterler içermelidir.</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" ng-click="closeModal()">Kapat</button>
+                    <button type="button" class="btn btn-primary" ng-click="confirmPurchase()">Sepeti Onayla</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         angular.module('myApp', [])
-            .controller('myController', function ($scope) {
+            .controller('myController', function ($scope, $filter) {
+
 
                 $scope.films = [
-                    { "id": 1, "fname": "Film 1", "fyear": "2020", "category": "Aksiyon" },
-                    { "id": 2, "fname": "Film 2", "fyear": "2023", "category": "Aksiyon" },
-                    { "id": 3, "fname": "Film 3", "fyear": "2018", "category": "Aksiyon" },
+                    {
+                        "id": 1, "fname": "Extraction", "fyear": "2020",
+                        "category": "Aksiyon", "imgName": "1.jpg"
+                    },
+                    {
+                        "id": 2, "fname": "The Gray Man", "fyear": "2022",
+                        "category": "Aksiyon", "imgName": "2.jpg"
+                    },
+                    {
+                        "id": 3, "fname": "John Wick", "fyear": "2017",
+                        "category": "Aksiyon", "imgName": "3.jpg"
+                    },
 
-                    { "id": 4, "fname": "Zootropolis", "fyear": "2017", "category": "Animasyon" },
-                    { "id": 5, "fname": "Cars", "fyear": "2018", "category": "Animasyon" },
-                    { "id": 6, "fname": "Frozen", "fyear": "2023", "category": "Animasyon" },
+                    {
+                        "id": 4, "fname": "Zootropolis", "fyear": "2017",
+                        "category": "Animasyon", "imgName": "4.jpg"
+                    },
+                    {
+                        "id": 5, "fname": "Cars", "fyear": "2018",
+                        "category": "Animasyon", "imgName": "5.jpg"
+                    },
+                    {
+                        "id": 6, "fname": "Frozen", "fyear": "2013",
+                        "category": "Animasyon", "imgName": "6.jpg"
+                    },
 
-                    { "id": 7, "fname": "Interstaller", "fyear": "2011", "category": "Bilim Kurgu" },
-                    { "id": 8, "fname": "Tenet", "fyear": "2010", "category": "Bilim Kurgu" },
-                    { "id": 9, "fname": "Dune", "fyear": "2024", "category": "Bilim Kurgu" },
+                    {
+                        "id": 7, "fname": "Interstaller", "fyear": "2013",
+                        "category": "Bilim Kurgu", "imgName": "7.jpg"
+                    },
+                    {
+                        "id": 8, "fname": "Tenet", "fyear": "2021",
+                        "category": "Bilim Kurgu", "imgName": "8.jpg"
+                    },
+                    {
+                        "id": 9, "fname": "Dune", "fyear": "2022",
+                        "category": "Bilim Kurgu", "imgName": "9.jpg"
+                    }
+
 
                 ];
 
-
                 $scope.genres = ['Aksiyon', 'Animasyon', 'Bilim Kurgu'];
+                $scope.months = [];
+                for (var i = 1; i <= 12; i++) {
+                    $scope.months.push(i);
+                }
+                $scope.years = [];
+                var currentYear = new Date().getFullYear();
+                for (var i = 1; i < 11; i++) {
+                    $scope.years.push(currentYear + i);
+                }
+
+                // $scope.sortFilms = function () {
+                //     if ($scope.sortBy === 'fyear') {
+                //         $scope.films = $filter('orderBy')($scope.films, 'fyear');
+                //     } else if ($scope.sortBy === 'imdb') {
+                //         $scope.films = $filter('orderBy')($scope.films, '-imdb');
+                //     }
+                // };
 
                 $scope.selectedGenre = '';
 
@@ -204,15 +388,15 @@
                 };
                 $scope.filterFilms();
 
-                $scope.searchText = ''; // Arama ifadesi için bir değişken tanımlanır
+                $scope.searchText = ''; // Arama ifadesi için
 
-                $scope.searchFilms = function () { // Arama işlevi
-                    if (!$scope.searchText) { // Arama ifadesi boşsa, tüm filmleri göster
+                $scope.searchFilms = function () { // Search
+                    if (!$scope.searchText) { //  boşsa tüm filmler
                         $scope.filteredFilms = $scope.films;
                     } else {
                         $scope.filterFilms();
-                        var searchTextLower = $scope.searchText.toLowerCase();
-                       
+                        var searchTextLower = $scope.searchText.toLowerCase();//büyük küçük harf duyarlılıgı
+
                         $scope.filteredFilms = $scope.films.filter(function (film) {
                             return film.fname.toLowerCase().includes(searchTextLower) ||
                                 film.fyear.toLowerCase().includes(searchTextLower) ||
@@ -230,16 +414,16 @@
                 $scope.showButtons = function () {
                     $scope.filteredFilms.forEach(function (film) {
                         film.buttonShow = film.selected;
-                        if (film.selected) {
-                            $scope.selectedFilmId = film.id;
-                        }
+                        // if (film.selected) {
+                        //     $scope.selectedFilmId = film.id;
+                        // }
                     });
                 };
 
-                $scope.rent = function (filmId) {
+                $scope.buy = function (filmId) {
                     var selectedFilm;
 
-                    // Seçilen filmi bul
+                    // filmi bull
                     for (var i = 0; i < $scope.filteredFilms.length; i++) {
                         if ($scope.filteredFilms[i].id === filmId) {
                             selectedFilm = $scope.filteredFilms[i];
@@ -249,7 +433,6 @@
 
                     //let selectedFilm = $scope.filteredFilms.find(film => film.id === filmId);
 
-                    // Seçilen film kategorisine göre fiyatı belirle
                     switch (selectedFilm.category) {
                         case 'Aksiyon':
                             selectedFilm.price = 50;
@@ -261,7 +444,7 @@
                             selectedFilm.price = 40;
                             break;
                         default:
-                            selectedFilm.price = 10; // Eğer kategori belirtilmemişse fiyatı sıfıra ayarla
+                            selectedFilm.price = 10;
                     }
 
                     var item = {
@@ -273,7 +456,7 @@
 
                     // Sepete ekleme işlemi
                     if (!$scope.items) {
-                        $scope.items = []; // Sepet boşsa yeni bir dizi oluştur
+                        $scope.items = []; // boşsa yeni bir dizi +
                     }
                     $scope.items.push(item);
 
@@ -288,19 +471,81 @@
                     }
                 };
 
-                $scope.remove_item = function (item) {
-                    if (item) {
-                        $scope.items.splice($scope.items.indexOf(item), 1);
-                        $scope.total -= item.Price;
+
+                // $scope.rent = function (filmId) {
+                // };
+
+                $scope.removeSelectedItems = function () {
+                    var remainingItems = $scope.items.filter(function (item) {
+                        return !item.selected;
+                    });
+
+                    $scope.total = 0;
+                    remainingItems.forEach(function (item) {
+                        $scope.total += item.Price;
+                    });
+
+                    $scope.items = remainingItems;
+                };
+
+                $scope.openModal = function () {
+                    $('#ccModal').modal('show');
+                };
+
+                $scope.closeModal = function () {
+                    $('#ccModal').modal('hide');
+                };
+                // $scope.invalidCardNumber = false;
+                // $scope.checkCardNumber = function () {
+                //     if ($scope.cardInfo.number && $scope.cardInfo.number.length !== 16) {
+                //         $scope.invalidCardNumber = true;
+                //     } else {
+                //         $scope.invalidCardNumber = false;
+                //     }
+                // };
+
+                $scope.confirmPurchase = function () {
+                    if (!$scope.cardInfo || !$scope.cardInfo.name || !$scope.cardInfo.number || !$scope.cardInfo.expMonth || !$scope.cardInfo.expYear || !$scope.cardInfo.cvc) {
+                        // Uyarı kutusunu oluşturma
+                        var alertHtml = '<div class="alert alert-warning" role="alert">';
+                        alertHtml += 'Lütfen tüm kart bilgilerini doğru giriniz.';
+                        alertHtml += '</div>';
+
+                        // Uyarı kutusunu modal içine ekleme
+                        $('#ccModal .modal-body').prepend(alertHtml);
+                    } else {
+
+                        var successAlertHtml = '<div class="alert alert-success" role="alert">';
+                        successAlertHtml += 'Ödeme başarıyla tamamlandı!';
+                        successAlertHtml += '</div>';
+
+
+                        $('#ccModal .modal-body').prepend(successAlertHtml);
+                        $scope.items = [];
+                        $scope.total = 0;
+                       
+                        setTimeout(function () {
+                            $('#ccModal').modal('hide');
+                        }, 1000);
+                    }
+
+                    // Uyarı kutularını belirli bir süre sonra kaldırma
+                    setTimeout(function () {
+                        $('#ccModal .alert').fadeOut('slow', function () {
+                            $(this).remove();
+                        });
+                    }, 3000);
+                };
+
+
+                $scope.sortFilms = function () {
+                    if ($scope.sortBy === 'new') {
+                        $scope.filteredFilms = $filter('orderBy')($scope.filteredFilms, '-fyear');
+                    }
+                    else if ($scope.sortBy === 'old') {
+                        $scope.filteredFilms = $filter('orderBy')($scope.filteredFilms, 'fyear');
                     }
                 };
-
-                $scope.buy = function (filmId) {
-                    
-
-               
-                };
-
 
             });
     </script>
